@@ -213,7 +213,7 @@ class RegisterScreen:
 
     def goto_main_screen(self):
         if self.register():
-            # 销毁登陆界面，显示主界面
+            # 销毁注册界面，显示主界面
             self.master.destroy()
             # 创建主窗口并运行程序
             master = tk.Tk()
@@ -856,7 +856,7 @@ class TodayAdd:
         self.goto_today_page()
 
     def goto_today_page(self):
-        # 销毁登陆界面，显示主界面
+        # 销毁当前界面，显示Today界面
         self.master.destroy()
         # 创建主窗口并运行程序
         master = tk.Tk()
