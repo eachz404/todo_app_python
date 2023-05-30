@@ -151,7 +151,7 @@ class LoginScreen:
                                   relief="flat")
         self.button_2.place(x=13.120635986328125, y=59.0, width=82.87936401367188, height=20.0)
 
-    def login(self):
+    def login(self):  # TODO: 增加密码强度验证功能
         account = self.entry_1.get().rstrip()
         password = self.entry_2.get()
         with open("user_info.json", "r") as f:
@@ -345,7 +345,7 @@ class MainScreen:
         image_image_1 = tk.PhotoImage(file=self.relative_to_assets("image_1.png"))
         self.image_1 = self.canvas.create_image(217.0, 466.0, image=image_image_1)
 
-    def create_interactive_controls(self):
+    def create_interactive_controls(self):  # TODO: 增加“我的”界面
         global button_image_1, button_image_2, button_image_3, button_image_4
 
         button_image_1 = tk.PhotoImage(file=self.relative_to_assets("button_1.png"))
@@ -2061,7 +2061,7 @@ class SearchPage:
 
         self.master.resizable(False, False)
 
-    def search(self):
+    def search(self):  # TODO: 优化查找算法
         self.listbox.delete(0, tk.END)
         kw = self.entry_1.get()
         result = []
