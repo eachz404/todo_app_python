@@ -8,44 +8,44 @@
 
 ### 项目结构
 
-![img](https://github.com/eachz404/todo_app/blob/main/imgs/File_structure.png?raw=true)
+![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/File_structure.png?raw=true)
 
 ### 欢迎界面
 
-![img](https://github.com/eachz404/todo_app/blob/main/imgs/Welcome_screen.png?raw=true)
+![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Welcome_screen.png?raw=true)
 
 - 点击`Login`按钮可以跳转到`登陆界面`
 - 点击`Register`按钮可以跳转到`注册界面`
 
 ### 登录、注册界面
 
-![img](https://github.com/eachz404/todo_app/blob/main/imgs/Login_screen.png?raw=true)
+![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Login_screen.png?raw=true)
 
-![img](https://github.com/eachz404/todo_app/blob/main/imgs/Register_screen.png?raw=true)
+![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Register_screen.png?raw=true)
 
 输入完信息以后点击登录/注册按钮就可以跳转到主界面。
 
 ### 主界面
 
-![img](https://github.com/eachz404/todo_app/blob/main/imgs/Main_screen.png?raw=true)
+![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Main_screen.png?raw=true)
 
 主页面上有四个按钮，分别指向四个功能模块。
 
 ### Today / Important 界面
 
-![img](https://github.com/eachz404/todo_app/blob/main/imgs/Today_screen.png?raw=true)
+![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Today_screen.png?raw=true)
 
 ### 任务添加/任务编辑界面
 
-![img](https://github.com/eachz404/todo_app/blob/main/imgs/Add_and_edit_screen.png?raw=true)
+![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Add_and_edit_screen.png?raw=true)
 
 ### 搜索界面
 
-![img](https://github.com/eachz404/todo_app/blob/main/imgs/Search_screen.png?raw=true)
+![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Search_screen.png?raw=true)
 
 ### 回收站界面
 
-![img](https://github.com/eachz404/todo_app/blob/main/imgs/Trash_bin_screen.png?raw=true)
+![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Trash_bin_screen.png?raw=true)
 
 ## 功能的代码实现
 
