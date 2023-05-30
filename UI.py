@@ -11,6 +11,7 @@ import task
 # ASSET_BASE_PATH = "D:\\Code\\To-Do App\\assets\\"
 ASSET_BASE_PATH = os.path.dirname(os.path.abspath(__file__)) + "\\assets\\"
 
+global current_user_id
 
 class WelcomeScreen:
     def __init__(self, root):
@@ -158,6 +159,8 @@ class LoginScreen:
             user_info = json.load(f)
         if account in user_info:
             if user_info[account] == get_md5(password):
+                global current_user_id
+                current_user_id = account
                 return True
             else:
                 tk.messagebox.showwarning(title='警告', message='密码错误')
@@ -291,6 +294,16 @@ class RegisterScreen:
             return False
         else:
             user_info[account] = get_md5(password)
+            global current_user_id
+            current_user_id = account
+            if os.getcwd().split('\\')[-1] != "tasks":
+                base_dir = os.getcwd()
+                os.chdir(os.getcwd() + "\\tasks\\")
+                os.makedirs(account)
+                os.chdir(base_dir)
+                print(base_dir)
+            else:
+                base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             with open("user_info.json", "w") as f:
                 json.dump(user_info, f)
             return True
@@ -520,14 +533,15 @@ class TodayPage:
         result = []
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []
+
         for data in os.listdir(os.getcwd()):
             with open(data, "rb") as f:
                 obj = pickle.load(f)
-                # print(f"loading {obj.get_info()}")
+                print(f"loading {obj.get_info()}")
                 all_tasks.append(obj)
         os.chdir(base_dir)
         for task in all_tasks:
@@ -545,7 +559,7 @@ class TodayPage:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -572,7 +586,7 @@ class TodayPage:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -597,7 +611,7 @@ class TodayPage:
             # print(content)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -895,7 +909,7 @@ class TodayAdd:
 
         if "tasks" not in os.listdir(os.getcwd()):
             os.makedirs("tasks")
-        os.chdir(os.getcwd() + "\\tasks\\")
+        os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         now = datetime.datetime.now()
         formatted_time = now.strftime("%Y-%m-%d_%H-%M-%S")
         with open(f"task_{formatted_time}.dat", "wb") as f:
@@ -1296,7 +1310,7 @@ class ImportantPage:
         result = []
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []
@@ -1320,7 +1334,7 @@ class ImportantPage:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -1347,7 +1361,7 @@ class ImportantPage:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -1372,7 +1386,7 @@ class ImportantPage:
             # print(content)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -1685,7 +1699,7 @@ class ImportantAdd:
         base_dir = os.getcwd()
         if "tasks" not in os.listdir(os.getcwd()):
             os.makedirs("tasks")
-        os.chdir(os.getcwd() + "\\tasks\\")
+        os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         now = datetime.datetime.now()
         formatted_time = now.strftime("%Y-%m-%d_%H-%M-%S")
         with open(f"task_{formatted_time}.dat", "wb") as f:
@@ -2067,7 +2081,7 @@ class SearchPage:
         result = []
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []
@@ -2194,7 +2208,7 @@ class TrashBin:
         result = []
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []
@@ -2221,7 +2235,7 @@ class TrashBin:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -2248,7 +2262,7 @@ class TrashBin:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):

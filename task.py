@@ -1,4 +1,4 @@
-class Task:  # TODO: 增加任务归属用户属性
+class Task:
     def __init__(self, status='has not started', description='None', priority='normal', deadline='None'):
         self.status = status
         self.content = []
