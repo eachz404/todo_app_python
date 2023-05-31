@@ -135,6 +135,7 @@ class LoginScreen:
                                 show="*",
                                 textvariable=self.entry_2_text)
         self.entry_2.place(x=110.0, y=227.0, width=311.0, height=26.0)
+        self.entry_2.bind("<Return>", self.call_login)
 
         button_image_1 = tk.PhotoImage(file=self.relative_to_assets("button_1.png"))
         self.button_1 = tk.Button(image=button_image_1,
@@ -151,6 +152,10 @@ class LoginScreen:
                                   command=self.goto_welcome_screen,
                                   relief="flat")
         self.button_2.place(x=13.120635986328125, y=59.0, width=82.87936401367188, height=20.0)
+
+    def call_login(self, arg):
+        # print(arg)
+        self.goto_main_screen()
 
     def login(self):  # TODO: 增加密码强度验证功能
         account = self.entry_1.get().rstrip()
@@ -251,6 +256,7 @@ class RegisterScreen:
             textvariable=self.entry_text_2
         )
         self.entry_2.place(x=110.0, y=227.0, width=311.0, height=26.0)
+        self.entry_2.bind("<Return>", self.call_register)
 
         button_image_1 = tk.PhotoImage(file=self.relative_to_assets("button_1.png"))
         self.button_1 = tk.Button(
@@ -273,6 +279,9 @@ class RegisterScreen:
             relief="flat"
         )
         self.button_2.place(x=13.12060546875, y=59.0, width=82.87939453125, height=20.0)
+
+    def call_register(self, arg):
+        self.goto_main_screen()
 
     def register(self):
         if "user_info.json" not in os.listdir():
@@ -2066,6 +2075,8 @@ class SearchPage:
             highlightthickness=0
         )
         self.entry_1.place(x=46.0, y=95.0, width=356.0, height=28.0)
+        self.entry_1.bind("<Return>", self.call_search)
+
         self.listbox = tk.Listbox(self.canvas,
                                   border=0,
                                   selectbackground="#b0b7c1",
@@ -2074,6 +2085,9 @@ class SearchPage:
         self.listbox.place(x=0.0, y=130, width=430, height=780)
 
         self.master.resizable(False, False)
+
+    def call_search(self, arg):
+        self.search()
 
     def search(self):  # TODO: 优化查找算法
         self.listbox.delete(0, tk.END)
@@ -2095,7 +2109,9 @@ class SearchPage:
                 if information.find(kw) != -1:
                     result.append(task)
                     break
-        print(f"result:{result}")
+        # print(f"result:{result}")
+        if len(result) == 0:
+            print("No matched result.")
         for item in result:
             self.listbox.insert('end', item.content + " " + item.description)
         os.chdir(base_dir)
