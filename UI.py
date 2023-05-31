@@ -310,7 +310,7 @@ class RegisterScreen:
                 os.chdir(os.getcwd() + "\\tasks\\")
                 os.makedirs(account)
                 os.chdir(base_dir)
-                print(base_dir)
+                # print(base_dir)
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             with open("user_info.json", "w") as f:
@@ -550,7 +550,7 @@ class TodayPage:
         for data in os.listdir(os.getcwd()):
             with open(data, "rb") as f:
                 obj = pickle.load(f)
-                print(f"loading {obj.get_info()}")
+                # print(f"loading {obj.get_info()}")
                 all_tasks.append(obj)
         os.chdir(base_dir)
         for task in all_tasks:
