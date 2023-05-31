@@ -368,7 +368,7 @@ class MainScreen:
         self.image_1 = self.canvas.create_image(217.0, 466.0, image=image_image_1)
 
     def create_interactive_controls(self):  # TODO: 增加“我的”界面
-        global button_image_1, button_image_2, button_image_3, button_image_4
+        global button_image_1, button_image_2, button_image_3, button_image_4, button_image_5
 
         button_image_1 = tk.PhotoImage(file=self.relative_to_assets("button_1.png"))
         self.button_1 = tk.Button(
@@ -416,6 +416,21 @@ class MainScreen:
             height=60.0
         )
 
+        button_image_5 = tk.PhotoImage(
+            file=self.relative_to_assets("button_5.png"))
+        self.button_5 = tk.Button(
+            image=button_image_5,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_5 clicked"),
+            relief="flat"
+        )
+        self.button_5.place(
+            x=377.0,
+            y=92.0,
+            width=40.0,
+            height=40.0
+        )
     def goto_today_page(self):
         # 销毁登陆界面，显示主界面
         self.master.destroy()
