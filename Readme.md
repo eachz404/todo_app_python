@@ -27,6 +27,9 @@
 
 输入完信息以后点击登录/注册按钮就可以跳转到主界面。
 
+
+同时，你也可以在键入账号与密码信息后按下键盘上的`Enter`按键进行登录/注册。
+
 ### 主界面
 
 ![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Main_screen.png?raw=true)
@@ -44,6 +47,8 @@
 ### 搜索界面
 
 ![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Search_screen.png?raw=true)
+
+在键入关键词以后，你可以按下键盘上的`Enter`按键进行搜索。
 
 ### 回收站界面
 

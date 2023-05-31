@@ -157,7 +157,7 @@ class LoginScreen:
         # print(arg)
         self.goto_main_screen()
 
-    def login(self):  # TODO: 增加密码强度验证功能
+    def login(self):
         account = self.entry_1.get().rstrip()
         password = self.entry_2.get()
         with open("user_info.json", "r") as f:
@@ -283,7 +283,7 @@ class RegisterScreen:
     def call_register(self, arg):
         self.goto_main_screen()
 
-    def register(self):
+    def register(self):  # TODO: 增加密码强度验证功能
         if "user_info.json" not in os.listdir():
             with open("user_info.json", "w"):
                 user_info = {}
