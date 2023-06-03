@@ -34,7 +34,7 @@
 
 ![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Main_screen.png?raw=true)
 
-主页面上有四个按钮，分别指向四个功能模块。
+主页面上有五个按钮，分别指向五个功能模块。
 
 ### Today / Important 界面
 
