@@ -27,6 +27,9 @@
 
 输入完信息以后点击登录/注册按钮就可以跳转到主界面。
 
+
+同时，你也可以在键入账号与密码信息后按下键盘上的`Enter`按键进行登录/注册。
+
 ### 主界面
 
 ![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Main_screen.png?raw=true)
@@ -44,6 +47,8 @@
 ### 搜索界面
 
 ![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Search_screen.png?raw=true)
+
+在键入关键词以后，你可以按下键盘上的`Enter`按键进行搜索。
 
 ### 回收站界面
 
@@ -154,6 +159,7 @@ class RegisterScreen:
             textvariable=self.entry_text_2
         )
         self.entry_2.place(x=110.0, y=227.0, width=311.0, height=26.0)
+        self.entry_2.bind("<Return>", self.call_register)
 
         button_image_1 = tk.PhotoImage(file=self.relative_to_assets("button_1.png"))
         self.button_1 = tk.Button(
@@ -179,6 +185,9 @@ class RegisterScreen:
 
         self.master.resizable(False, False)
 
+    def call_register(self, arg):
+        self.goto_main_screen()
+        
     def goto_welcome_screen(self):
         # 销毁注册界面，显示欢迎界面
         self.master.destroy()
@@ -194,7 +203,7 @@ class RegisterScreen:
         else:
             with open("user_info.json", "r") as f:
                 user_info = json.load(f)
-
+        
         account = self.entry_1.get().rstrip()
         password = self.entry_2.get()
         if account == "" or password == "":
@@ -207,6 +216,16 @@ class RegisterScreen:
             return False
         else:
             user_info[account] = get_md5(password)
+            global current_user_id
+            current_user_id = account
+            if os.getcwd().split('\\')[-1] != "tasks":
+                base_dir = os.getcwd()
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
+                os.makedirs(account)
+                os.chdir(base_dir)
+                print(base_dir)
+            else:
+                base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             with open("user_info.json", "w") as f:
                 json.dump(user_info, f)
             return True
@@ -444,7 +463,7 @@ class TodayPage:
         # 识别路径
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []
@@ -483,7 +502,7 @@ class TodayPage:
             content = self.listbox.get(index)  # 获取选中项内容
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -512,7 +531,7 @@ class TodayPage:
         content = self.listbox.get(index) # 获取选中项内容
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         for data in os.listdir(os.getcwd()):
@@ -539,7 +558,7 @@ class TodayPage:
             # print(content)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -844,7 +863,7 @@ class TodayAdd:
         # 判断并跳转到tasks目录，存储对象
         if "tasks" not in os.listdir(os.getcwd()):
             os.makedirs("tasks")
-        os.chdir(os.getcwd() + "\\tasks\\")
+        os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         now = datetime.datetime.now() # 获取时间
         formatted_time = now.strftime("%Y-%m-%d_%H-%M-%S")
         # 以创建时间命名数据文件
@@ -904,7 +923,7 @@ def edit_task(self):
         result = []
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []  # 定义列表用于存储对象
@@ -920,7 +939,9 @@ def edit_task(self):
                 if information.find(kw) != -1:
                     result.append(task)
                     break
-        print(f"result:{result}")
+        # print(f"result:{result}")
+        if len(result) == 0:
+            print("No matched result.")
         # 将结果写入到listbox中
         for item in result:
             self.listbox.insert('end', item.content + " " + item.description)
@@ -940,7 +961,7 @@ def edit_task(self):
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             # 读取数据
@@ -972,7 +993,7 @@ def edit_task(self):
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             # 匹配对象
