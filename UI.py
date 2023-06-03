@@ -294,6 +294,7 @@ class RegisterScreen:
 
         account = self.entry_1.get().rstrip()
         password = self.entry_2.get()
+
         if account == "" or password == "":
             tk.messagebox.showwarning(title='警告', message='账号或密码不能为空')
             return False
@@ -303,20 +304,54 @@ class RegisterScreen:
             self.entry_text_2.set("")
             return False
         else:
-            user_info[account] = get_md5(password)
-            global current_user_id
-            current_user_id = account
-            if os.getcwd().split('\\')[-1] != "tasks":
-                base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
-                os.makedirs(account)
-                os.chdir(base_dir)
-                # print(base_dir)
+            if self.password_strength_verification(password):
+                user_info[account] = get_md5(password)
+                global current_user_id
+                current_user_id = account
+                if os.getcwd().split('\\')[-1] != "tasks":
+                    base_dir = os.getcwd()
+                    os.chdir(os.getcwd() + "\\tasks\\")
+                    os.makedirs(account)
+                    os.chdir(base_dir)
+                    # print(base_dir)
+                else:
+                    base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
+                with open("user_info.json", "w") as f:
+                    json.dump(user_info, f)
+                return True
             else:
-                base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
-            with open("user_info.json", "w") as f:
-                json.dump(user_info, f)
+                return False
+
+    def password_strength_verification(self, password):
+        len_check = False
+        num_check = False
+        character_check = False
+
+        error = ""
+
+        if len(password) < 8:
+            error = "The password length cannot be less than 8 characters."
+            len_check = False
+        else:
+            len_check = True
+        if password.isdigit():
+            error = "Password cannot contain only numbers."
+            num_check = False
+        else:
+            num_check = True
+        if password.isalpha():
+            error = "Password must contain numbers."
+            character_check = False
+        else:
+            character_check = True
+
+        if len_check and num_check and character_check:
             return True
+        else:
+            tk.messagebox.showwarning(title='Password strength check failed', message=error)
+            self.entry_text_1.set("")
+            self.entry_text_2.set("")
+
 
     def goto_welcome_screen(self):
         # 销毁注册界面，显示欢迎界面
