@@ -284,7 +284,7 @@ class RegisterScreen:
     def call_register(self, arg):
         self.goto_main_screen()
 
-    def register(self):  # TODO: 增加密码强度验证功能
+    def register(self):
         if "user_info.json" not in os.listdir():
             with open("user_info.json", "w"):
                 user_info = {}
@@ -403,7 +403,7 @@ class MainScreen:
         image_image_1 = tk.PhotoImage(file=self.relative_to_assets("image_1.png"))
         self.image_1 = self.canvas.create_image(217.0, 466.0, image=image_image_1)
 
-    def create_interactive_controls(self):  # TODO: 增加“我的”界面
+    def create_interactive_controls(self):
         global button_image_1, button_image_2, button_image_3, button_image_4, button_image_5
 
         button_image_1 = tk.PhotoImage(file=self.relative_to_assets("button_1.png"))
@@ -2146,7 +2146,7 @@ class SearchPage:
     def call_search(self, arg):
         self.search()
 
-    def search(self):  # TODO: 优化查找算法
+    def search(self):
         self.listbox.delete(0, tk.END)
         kw = self.entry_1.get()
         result = []
