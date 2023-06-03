@@ -11,6 +11,8 @@ import task
 # ASSET_BASE_PATH = "D:\\Code\\To-Do App\\assets\\"
 ASSET_BASE_PATH = os.path.dirname(os.path.abspath(__file__)) + "\\assets\\"
 
+global current_user_id
+
 
 class WelcomeScreen:
     def __init__(self, root):
@@ -134,6 +136,7 @@ class LoginScreen:
                                 show="*",
                                 textvariable=self.entry_2_text)
         self.entry_2.place(x=110.0, y=227.0, width=311.0, height=26.0)
+        self.entry_2.bind("<Return>", self.call_login)
 
         button_image_1 = tk.PhotoImage(file=self.relative_to_assets("button_1.png"))
         self.button_1 = tk.Button(image=button_image_1,
@@ -151,6 +154,10 @@ class LoginScreen:
                                   relief="flat")
         self.button_2.place(x=13.120635986328125, y=59.0, width=82.87936401367188, height=20.0)
 
+    def call_login(self, arg):
+        # print(arg)
+        self.goto_main_screen()
+
     def login(self):
         account = self.entry_1.get().rstrip()
         password = self.entry_2.get()
@@ -158,6 +165,8 @@ class LoginScreen:
             user_info = json.load(f)
         if account in user_info:
             if user_info[account] == get_md5(password):
+                global current_user_id
+                current_user_id = account
                 return True
             else:
                 tk.messagebox.showwarning(title='警告', message='密码错误')
@@ -248,6 +257,7 @@ class RegisterScreen:
             textvariable=self.entry_text_2
         )
         self.entry_2.place(x=110.0, y=227.0, width=311.0, height=26.0)
+        self.entry_2.bind("<Return>", self.call_register)
 
         button_image_1 = tk.PhotoImage(file=self.relative_to_assets("button_1.png"))
         self.button_1 = tk.Button(
@@ -271,6 +281,9 @@ class RegisterScreen:
         )
         self.button_2.place(x=13.12060546875, y=59.0, width=82.87939453125, height=20.0)
 
+    def call_register(self, arg):
+        self.goto_main_screen()
+
     def register(self):
         if "user_info.json" not in os.listdir():
             with open("user_info.json", "w"):
@@ -281,19 +294,64 @@ class RegisterScreen:
 
         account = self.entry_1.get().rstrip()
         password = self.entry_2.get()
+
         if account == "" or password == "":
-            tk.messagebox.showwarning(title='警告', message='账号或密码不能为空')
+            tk.messagebox.showwarning(title='Warning', message='Account or password cannot be empty.')
             return False
         if account in user_info:
-            tk.messagebox.showwarning(title='警告', message='账号已存在')
+            tk.messagebox.showwarning(title='Warning', message='Account already exists.')
             self.entry_text_1.set("")
             self.entry_text_2.set("")
             return False
         else:
-            user_info[account] = get_md5(password)
-            with open("user_info.json", "w") as f:
-                json.dump(user_info, f)
+            if self.password_strength_verification(password):
+                user_info[account] = get_md5(password)
+                global current_user_id
+                current_user_id = account
+                if os.getcwd().split('\\')[-1] != "tasks":
+                    base_dir = os.getcwd()
+                    os.chdir(os.getcwd() + "\\tasks\\")
+                    os.makedirs(account)
+                    os.chdir(base_dir)
+                    # print(base_dir)
+                else:
+                    base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
+                with open("user_info.json", "w") as f:
+                    json.dump(user_info, f)
+                return True
+            else:
+                return False
+
+    def password_strength_verification(self, password):
+        len_check = False
+        num_check = False
+        character_check = False
+
+        error = ""
+
+        if len(password) < 8:
+            error = "The password length cannot be less than 8 characters."
+            len_check = False
+        else:
+            len_check = True
+        if password.isdigit():
+            error = "Password cannot contain only numbers."
+            num_check = False
+        else:
+            num_check = True
+        if password.isalpha():
+            error = "Password must contain numbers."
+            character_check = False
+        else:
+            character_check = True
+
+        if len_check and num_check and character_check:
             return True
+        else:
+            tk.messagebox.showwarning(title='Password strength check failed', message=error)
+            self.entry_text_1.set("")
+            self.entry_text_2.set("")
+
 
     def goto_welcome_screen(self):
         # 销毁注册界面，显示欢迎界面
@@ -346,7 +404,7 @@ class MainScreen:
         self.image_1 = self.canvas.create_image(217.0, 466.0, image=image_image_1)
 
     def create_interactive_controls(self):
-        global button_image_1, button_image_2, button_image_3, button_image_4
+        global button_image_1, button_image_2, button_image_3, button_image_4, button_image_5
 
         button_image_1 = tk.PhotoImage(file=self.relative_to_assets("button_1.png"))
         self.button_1 = tk.Button(
@@ -394,6 +452,21 @@ class MainScreen:
             height=60.0
         )
 
+        button_image_5 = tk.PhotoImage(
+            file=self.relative_to_assets("button_5.png"))
+        self.button_5 = tk.Button(
+            image=button_image_5,
+            borderwidth=0,
+            highlightthickness=0,
+            command=self.goto_my_page,
+            relief="flat"
+        )
+        self.button_5.place(
+            x=377.0,
+            y=92.0,
+            width=40.0,
+            height=40.0
+        )
     def goto_today_page(self):
         # 销毁登陆界面，显示主界面
         self.master.destroy()
@@ -418,6 +491,12 @@ class MainScreen:
         self.master.destroy()
         master = tk.Tk()
         app = TrashBin(master)
+        master.mainloop()
+
+    def goto_my_page(self):
+        self.master.destroy()
+        master = tk.Tk()
+        app = MyPage(master)
         master.mainloop()
 
     @staticmethod
@@ -520,10 +599,11 @@ class TodayPage:
         result = []
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []
+
         for data in os.listdir(os.getcwd()):
             with open(data, "rb") as f:
                 obj = pickle.load(f)
@@ -545,7 +625,7 @@ class TodayPage:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -572,7 +652,7 @@ class TodayPage:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -597,7 +677,7 @@ class TodayPage:
             # print(content)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -895,7 +975,7 @@ class TodayAdd:
 
         if "tasks" not in os.listdir(os.getcwd()):
             os.makedirs("tasks")
-        os.chdir(os.getcwd() + "\\tasks\\")
+        os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         now = datetime.datetime.now()
         formatted_time = now.strftime("%Y-%m-%d_%H-%M-%S")
         with open(f"task_{formatted_time}.dat", "wb") as f:
@@ -1296,7 +1376,7 @@ class ImportantPage:
         result = []
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []
@@ -1320,7 +1400,7 @@ class ImportantPage:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -1347,7 +1427,7 @@ class ImportantPage:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -1372,7 +1452,7 @@ class ImportantPage:
             # print(content)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -1685,7 +1765,7 @@ class ImportantAdd:
         base_dir = os.getcwd()
         if "tasks" not in os.listdir(os.getcwd()):
             os.makedirs("tasks")
-        os.chdir(os.getcwd() + "\\tasks\\")
+        os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         now = datetime.datetime.now()
         formatted_time = now.strftime("%Y-%m-%d_%H-%M-%S")
         with open(f"task_{formatted_time}.dat", "wb") as f:
@@ -2052,6 +2132,8 @@ class SearchPage:
             highlightthickness=0
         )
         self.entry_1.place(x=46.0, y=95.0, width=356.0, height=28.0)
+        self.entry_1.bind("<Return>", self.call_search)
+
         self.listbox = tk.Listbox(self.canvas,
                                   border=0,
                                   selectbackground="#b0b7c1",
@@ -2061,13 +2143,16 @@ class SearchPage:
 
         self.master.resizable(False, False)
 
+    def call_search(self, arg):
+        self.search()
+
     def search(self):
         self.listbox.delete(0, tk.END)
         kw = self.entry_1.get()
         result = []
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []
@@ -2081,7 +2166,9 @@ class SearchPage:
                 if information.find(kw) != -1:
                     result.append(task)
                     break
-        print(f"result:{result}")
+        # print(f"result:{result}")
+        if len(result) == 0:
+            print("No matched result.")
         for item in result:
             self.listbox.insert('end', item.content + " " + item.description)
         os.chdir(base_dir)
@@ -2194,7 +2281,7 @@ class TrashBin:
         result = []
         if os.getcwd().split('\\')[-1] != "tasks":
             base_dir = os.getcwd()
-            os.chdir(os.getcwd() + "\\tasks\\")
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
         else:
             base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
         all_tasks = []
@@ -2221,7 +2308,7 @@ class TrashBin:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -2248,7 +2335,7 @@ class TrashBin:
             content = self.listbox.get(index)
             if os.getcwd().split('\\')[-1] != "tasks":
                 base_dir = os.getcwd()
-                os.chdir(os.getcwd() + "\\tasks\\")
+                os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
             else:
                 base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
             for data in os.listdir(os.getcwd()):
@@ -2275,6 +2362,224 @@ class TrashBin:
         full_path = os.path.join(assets_dir, path)
         return full_path
 
+
+class MyPage:
+    def __init__(self, master):
+        self.master = master
+        self.master.geometry("430x932+0+0")
+        self.master.configure(bg="#FFFFFF")
+        self.master.title("To-Do App")
+        self.create_widgets()
+        self.create_interactive_controls()
+        self.display_statistic_data()
+
+    def create_widgets(self):
+        self.canvas = tk.Canvas(
+            self.master,
+            bg="#FFFFFF",
+            height=932,
+            width=430,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+        self.canvas.place(x=0, y=0)
+
+        global image_image_1, image_image_2, image_image_3
+        image_image_1 = tk.PhotoImage(
+            file=self.relative_to_assets("image_1.png"))
+        image_1 = self.canvas.create_image(
+            215.0,
+            466.0,
+            image=image_image_1
+        )
+
+        image_image_2 = tk.PhotoImage(
+            file=self.relative_to_assets("image_2.png"))
+        image_2 = self.canvas.create_image(
+            215.0,
+            32.0,
+            image=image_image_2
+        )
+
+        image_image_3 = tk.PhotoImage(
+            file=self.relative_to_assets("image_3.png"))
+        image_3 = self.canvas.create_image(
+            214.0,
+            396.0,
+            image=image_image_3
+        )
+
+        self.finished_tasks_num = tk.StringVar()
+        self.all_tasks_num = tk.StringVar()
+        self.important_tasks_num = tk.StringVar()
+        self.today_tasks_num  = tk.StringVar()
+
+        self.finished_label = tk.Label(
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            textvariable=self.finished_tasks_num,
+            font=("Comic Sans MS", 24),
+            highlightthickness=0
+        )
+        self.finished_label.place(
+            x=358.0,
+            y=414.0,
+            width=48.0,
+            height=46.0
+        )
+
+        self.all_label = tk.Label(
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            textvariable=self.all_tasks_num,
+            font=("Comic Sans MS", 24),
+            highlightthickness=0
+        )
+        self.all_label.place(
+            x=145.0,
+            y=414.0,
+            width=48.0,
+            height=46.0
+        )
+
+        self.important_label = tk.Label(
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            textvariable=self.important_tasks_num,
+            font=("Comic Sans MS", 24),
+            highlightthickness=0
+        )
+        self.important_label.place(
+            x=358.5,
+            y=314.0,
+            width=48.0,
+            height=46.0
+        )
+
+        self.today_label = tk.Label(
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            textvariable=self.today_tasks_num,
+            font=("Comic Sans MS", 24),
+            highlightthickness=0
+        )
+        self.today_label.place(
+            x=145.5,
+            y=314.0,
+            width=48.0,
+            height=46.0
+        )
+
+        self.account_label = tk.Label(
+            bd=0,
+            bg="#F5F5F5",
+            fg="#000716",
+            text=current_user_id,
+            font=("Comic Sans MS",16),
+            highlightthickness=0
+        )
+        self.account_label.place(
+            x=155.5,
+            y=268.0,
+            width=119.0,
+            height=21.0
+        )
+
+    def create_interactive_controls(self):
+        global button_image_1, button_image_2
+        button_image_1 = tk.PhotoImage(
+            file=self.relative_to_assets("button_1.png"))
+        self.button_1 = tk.Button(
+            image=button_image_1,
+            borderwidth=0,
+            highlightthickness=0,
+            command=self.goto_main_screen,
+            relief="flat"
+        )
+        self.button_1.place(
+            x=13.12060546875,
+            y=59.0,
+            width=53.87939453125,
+            height=20.0
+        )
+        button_image_2 = tk.PhotoImage(
+            file=self.relative_to_assets("button_2.png"))
+        button_2 = tk.Button(
+            image=button_image_2,
+            borderwidth=0,
+            highlightthickness=0,
+            command=self.goto_welcome_screen,
+            relief="flat"
+        )
+        button_2.place(
+            x=19.0,
+            y=560.0,
+            width=393.0,
+            height=45.0
+        )
+
+    def display_statistic_data(self):
+        data = self.get_stastic_data()
+        self.today_tasks_num.set(str(data["today"]))
+        self.important_tasks_num.set(str(data["important"]))
+        self.all_tasks_num.set(str(data["all"]))
+        self.finished_tasks_num.set(str(data["done"]))
+
+    @staticmethod
+    def get_stastic_data():
+        all_tasks = []
+        today_count = 0
+        important_count = 0
+        done_count = 0
+        if os.getcwd().split('\\')[-1] != "tasks":
+            base_dir = os.getcwd()
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
+        else:
+            base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
+
+        for data in os.listdir(os.getcwd()):
+            with open(data, "rb") as f:
+                obj = pickle.load(f)
+                # print(f"loading {obj.get_info()}")
+                all_tasks.append(obj)
+        os.chdir(base_dir)
+        for task in all_tasks:
+            info = task.get_info()
+            if info["label"] == "today":
+                today_count += 1
+            elif info["label"] == "important":
+                important_count += 1
+            if info["status"] == "done":
+                done_count += 1
+        return {"all":len(all_tasks), "today":today_count, "important":important_count, "done":done_count}
+
+    def goto_main_screen(self):
+        self.master.destroy()
+        # 创建主窗口并运行程序
+        master = tk.Tk()
+        app = MainScreen(master)
+        master.mainloop()
+
+    def goto_welcome_screen(self):
+        self.master.destroy()
+        global current_user_id
+        current_user_id = None
+        # 创建主窗口并运行程序
+        master = tk.Tk()
+        app = WelcomeScreen(master)
+        master.mainloop()
+
+
+    @staticmethod
+    def relative_to_assets(path: str):
+        assets_dir = ASSET_BASE_PATH + "frame10\\"
+        full_path = os.path.join(assets_dir, path)
+        return full_path
 
 def get_md5(string):
     m2 = hashlib.md5()
