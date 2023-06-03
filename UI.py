@@ -13,6 +13,7 @@ ASSET_BASE_PATH = os.path.dirname(os.path.abspath(__file__)) + "\\assets\\"
 
 global current_user_id
 
+
 class WelcomeScreen:
     def __init__(self, root):
         self.root = root
@@ -422,7 +423,7 @@ class MainScreen:
             image=button_image_5,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_5 clicked"),
+            command=self.goto_my_page,
             relief="flat"
         )
         self.button_5.place(
@@ -455,6 +456,12 @@ class MainScreen:
         self.master.destroy()
         master = tk.Tk()
         app = TrashBin(master)
+        master.mainloop()
+
+    def goto_my_page(self):
+        self.master.destroy()
+        master = tk.Tk()
+        app = MyPage(master)
         master.mainloop()
 
     @staticmethod
@@ -2320,6 +2327,224 @@ class TrashBin:
         full_path = os.path.join(assets_dir, path)
         return full_path
 
+
+class MyPage:
+    def __init__(self, master):
+        self.master = master
+        self.master.geometry("430x932+0+0")
+        self.master.configure(bg="#FFFFFF")
+        self.master.title("To-Do App")
+        self.create_widgets()
+        self.create_interactive_controls()
+        self.display_statistic_data()
+
+    def create_widgets(self):
+        self.canvas = tk.Canvas(
+            self.master,
+            bg="#FFFFFF",
+            height=932,
+            width=430,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+        self.canvas.place(x=0, y=0)
+
+        global image_image_1, image_image_2, image_image_3
+        image_image_1 = tk.PhotoImage(
+            file=self.relative_to_assets("image_1.png"))
+        image_1 = self.canvas.create_image(
+            215.0,
+            466.0,
+            image=image_image_1
+        )
+
+        image_image_2 = tk.PhotoImage(
+            file=self.relative_to_assets("image_2.png"))
+        image_2 = self.canvas.create_image(
+            215.0,
+            32.0,
+            image=image_image_2
+        )
+
+        image_image_3 = tk.PhotoImage(
+            file=self.relative_to_assets("image_3.png"))
+        image_3 = self.canvas.create_image(
+            214.0,
+            396.0,
+            image=image_image_3
+        )
+
+        self.finished_tasks_num = tk.StringVar()
+        self.all_tasks_num = tk.StringVar()
+        self.important_tasks_num = tk.StringVar()
+        self.today_tasks_num  = tk.StringVar()
+
+        self.finished_label = tk.Label(
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            textvariable=self.finished_tasks_num,
+            font=("Comic Sans MS", 24),
+            highlightthickness=0
+        )
+        self.finished_label.place(
+            x=358.0,
+            y=414.0,
+            width=48.0,
+            height=46.0
+        )
+
+        self.all_label = tk.Label(
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            textvariable=self.all_tasks_num,
+            font=("Comic Sans MS", 24),
+            highlightthickness=0
+        )
+        self.all_label.place(
+            x=145.0,
+            y=414.0,
+            width=48.0,
+            height=46.0
+        )
+
+        self.important_label = tk.Label(
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            textvariable=self.important_tasks_num,
+            font=("Comic Sans MS", 24),
+            highlightthickness=0
+        )
+        self.important_label.place(
+            x=358.5,
+            y=314.0,
+            width=48.0,
+            height=46.0
+        )
+
+        self.today_label = tk.Label(
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            textvariable=self.today_tasks_num,
+            font=("Comic Sans MS", 24),
+            highlightthickness=0
+        )
+        self.today_label.place(
+            x=145.5,
+            y=314.0,
+            width=48.0,
+            height=46.0
+        )
+
+        self.account_label = tk.Label(
+            bd=0,
+            bg="#F5F5F5",
+            fg="#000716",
+            text=current_user_id,
+            font=("Comic Sans MS",16),
+            highlightthickness=0
+        )
+        self.account_label.place(
+            x=155.5,
+            y=268.0,
+            width=119.0,
+            height=21.0
+        )
+
+    def create_interactive_controls(self):
+        global button_image_1, button_image_2
+        button_image_1 = tk.PhotoImage(
+            file=self.relative_to_assets("button_1.png"))
+        self.button_1 = tk.Button(
+            image=button_image_1,
+            borderwidth=0,
+            highlightthickness=0,
+            command=self.goto_main_screen,
+            relief="flat"
+        )
+        self.button_1.place(
+            x=13.12060546875,
+            y=59.0,
+            width=53.87939453125,
+            height=20.0
+        )
+        button_image_2 = tk.PhotoImage(
+            file=self.relative_to_assets("button_2.png"))
+        button_2 = tk.Button(
+            image=button_image_2,
+            borderwidth=0,
+            highlightthickness=0,
+            command=self.goto_welcome_screen,
+            relief="flat"
+        )
+        button_2.place(
+            x=19.0,
+            y=560.0,
+            width=393.0,
+            height=45.0
+        )
+
+    def display_statistic_data(self):
+        data = self.get_stastic_data()
+        self.today_tasks_num.set(str(data["today"]))
+        self.important_tasks_num.set(str(data["important"]))
+        self.all_tasks_num.set(str(data["all"]))
+        self.finished_tasks_num.set(str(data["done"]))
+
+    @staticmethod
+    def get_stastic_data():
+        all_tasks = []
+        today_count = 0
+        important_count = 0
+        done_count = 0
+        if os.getcwd().split('\\')[-1] != "tasks":
+            base_dir = os.getcwd()
+            os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
+        else:
+            base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
+
+        for data in os.listdir(os.getcwd()):
+            with open(data, "rb") as f:
+                obj = pickle.load(f)
+                # print(f"loading {obj.get_info()}")
+                all_tasks.append(obj)
+        os.chdir(base_dir)
+        for task in all_tasks:
+            info = task.get_info()
+            if info["label"] == "today":
+                today_count += 1
+            elif info["label"] == "important":
+                important_count += 1
+            if info["status"] == "done":
+                done_count += 1
+        return {"all":len(all_tasks), "today":today_count, "important":important_count, "done":done_count}
+
+    def goto_main_screen(self):
+        self.master.destroy()
+        # 创建主窗口并运行程序
+        master = tk.Tk()
+        app = MainScreen(master)
+        master.mainloop()
+
+    def goto_welcome_screen(self):
+        self.master.destroy()
+        global current_user_id
+        current_user_id = None
+        # 创建主窗口并运行程序
+        master = tk.Tk()
+        app = WelcomeScreen(master)
+        master.mainloop()
+
+
+    @staticmethod
+    def relative_to_assets(path: str):
+        assets_dir = ASSET_BASE_PATH + "frame10\\"
+        full_path = os.path.join(assets_dir, path)
+        return full_path
 
 def get_md5(string):
     m2 = hashlib.md5()
