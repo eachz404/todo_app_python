@@ -296,10 +296,10 @@ class RegisterScreen:
         password = self.entry_2.get()
 
         if account == "" or password == "":
-            tk.messagebox.showwarning(title='警告', message='账号或密码不能为空')
+            tk.messagebox.showwarning(title='Warning', message='Account or password cannot be empty.')
             return False
         if account in user_info:
-            tk.messagebox.showwarning(title='警告', message='账号已存在')
+            tk.messagebox.showwarning(title='Warning', message='Account already exists.')
             self.entry_text_1.set("")
             self.entry_text_2.set("")
             return False
