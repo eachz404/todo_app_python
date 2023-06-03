@@ -54,6 +54,12 @@
 
 ![img](https://github.com/eachz404/todo_app_python/blob/main/imgs/Trash_bin_screen.png?raw=true)
 
+### “我的”界面
+
+![My_screen.png](https://github.com/eachz404/todo_app_python/blob/main/imgs/My_screen.png?raw=true)
+
+
+
 ## 功能的代码实现
 
 ### 路径检测
@@ -1008,5 +1014,46 @@ def edit_task(self):
             os.chdir(base_dir)
             # 在列表中删除这一项
             self.listbox.delete(index)
+```
+
+### “我的”模块
+
+实现了一些统计信息的显示。以下代码是遍历数据文件进行数据统计并进行显示的具体实现。
+
+```Python
+@staticmethod
+def get_stastic_data():
+    all_tasks = []
+    today_count = 0
+    important_count = 0
+    done_count = 0
+    if os.getcwd().split('\\')[-1] != "tasks":
+        base_dir = os.getcwd()
+        os.chdir(os.getcwd() + "\\tasks\\" + current_user_id + "\\")
+    else:
+        base_dir = os.path.abspath(os.path.dirname(os.getcwd()))
+
+    for data in os.listdir(os.getcwd()):
+        with open(data, "rb") as f:
+            obj = pickle.load(f)
+            # print(f"loading {obj.get_info()}")
+            all_tasks.append(obj)
+    os.chdir(base_dir)
+    for task in all_tasks:
+        info = task.get_info()
+        if info["label"] == "today":
+            today_count += 1
+        elif info["label"] == "important":
+            important_count += 1
+        if info["status"] == "done":
+            done_count += 1
+    return {"all":len(all_tasks), "today":today_count, "important":important_count, "done":done_count}
+    
+def display_statistic_data(self):
+    data = self.get_stastic_data()
+    self.today_tasks_num.set(str(data["today"]))
+    self.important_tasks_num.set(str(data["important"]))
+    self.all_tasks_num.set(str(data["all"]))
+    self.finished_tasks_num.set(str(data["done"]))
 ```
 
