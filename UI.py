@@ -352,7 +352,6 @@ class RegisterScreen:
             self.entry_text_1.set("")
             self.entry_text_2.set("")
 
-
     def goto_welcome_screen(self):
         # 销毁注册界面，显示欢迎界面
         self.master.destroy()
@@ -467,6 +466,7 @@ class MainScreen:
             width=40.0,
             height=40.0
         )
+
     def goto_today_page(self):
         # 销毁登陆界面，显示主界面
         self.master.destroy()
@@ -2413,7 +2413,7 @@ class MyPage:
         self.finished_tasks_num = tk.StringVar()
         self.all_tasks_num = tk.StringVar()
         self.important_tasks_num = tk.StringVar()
-        self.today_tasks_num  = tk.StringVar()
+        self.today_tasks_num = tk.StringVar()
 
         self.finished_label = tk.Label(
             bd=0,
@@ -2480,7 +2480,7 @@ class MyPage:
             bg="#F5F5F5",
             fg="#000716",
             text=current_user_id,
-            font=("Comic Sans MS",16),
+            font=("Comic Sans MS", 16),
             highlightthickness=0
         )
         self.account_label.place(
@@ -2524,14 +2524,14 @@ class MyPage:
         )
 
     def display_statistic_data(self):
-        data = self.get_stastic_data()
+        data = self.get_statistics()
         self.today_tasks_num.set(str(data["today"]))
         self.important_tasks_num.set(str(data["important"]))
         self.all_tasks_num.set(str(data["all"]))
         self.finished_tasks_num.set(str(data["done"]))
 
     @staticmethod
-    def get_stastic_data():
+    def get_statistics():
         all_tasks = []
         today_count = 0
         important_count = 0
@@ -2556,7 +2556,7 @@ class MyPage:
                 important_count += 1
             if info["status"] == "done":
                 done_count += 1
-        return {"all":len(all_tasks), "today":today_count, "important":important_count, "done":done_count}
+        return {"all": len(all_tasks), "today": today_count, "important": important_count, "done": done_count}
 
     def goto_main_screen(self):
         self.master.destroy()
@@ -2574,12 +2574,12 @@ class MyPage:
         app = WelcomeScreen(master)
         master.mainloop()
 
-
     @staticmethod
     def relative_to_assets(path: str):
         assets_dir = ASSET_BASE_PATH + "frame10\\"
         full_path = os.path.join(assets_dir, path)
         return full_path
+
 
 def get_md5(string):
     m2 = hashlib.md5()
